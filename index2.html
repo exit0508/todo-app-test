@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>Todo list</title>
+</head>
+<body>
+    <div id=app>
+        <h1>Todo</h1>
+        <input type="text" class="todo-input" placeholder="タスクを入力してください" v-model="newTodo" @keyup.enter="addTodo">
+        
+        <div>タスク名|ネガティブ度|エネルギー</div>
+        <template>
+            <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
+                <input type="checkbox" v-model="todo.completed">
+                <span v-if="!todo.editing" @dblclick="editTodo(todo)" v-bind:class="[targetsMicrotasks(todo.level, todo.energy, index),{completed: todo.completed}]">{{ todo.title }}</span>
+                <input v-else class="todo-item-edit" type="text" v-model="todo.title" @blur="doneEdit(todo)" @keyup.enter="doneEdit(todo)">
+                
+                <span style="color: #1e90ff">｜{{ todo.level }}</span>
+                <input type="range" min="0" max="5" step="1" v-model="todo.level" @change="">
+                
+                <span style="color: #ff9e1e">｜{{ todo.energy }}</span>
+                <select v-model="todo.energy">
+                    <option disabled value="">選択して下さい</option>
+                    <option v-for="level in levels" v-bind:value="level.value">
+                        {{ level.label }}
+                    </option>
+                </select>
+                <button v-on:click="removeTodo(index)">&times;</button>
+                <button v-show="todo.target">細分化する</button>
+                <!-- <input type="text" v-if="todo.target" class="sub-todo-input" :key="sub" placeholder="タスクを細分化してください" v-model="newTodo" @keyup.enter="addTodo"> -->
+            </div>
+        </template>
+    </div>
+    
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                current: '',
+                levels: [
+                    { value:1, label:'高'},
+                    { value:0, label:'中'},
+                    { value:-1, label:'低'}
+                ],
+                newTodo: '',
+                idForTodo: 3,
+                beforeEditCache: '',
+                todos: [
+                    {
+                        'id': 1,
+                        'title': 'プレゼン資料作成',
+                        'completed': false,
+                        'level': 5,
+                        'energy': 1,
+                        'editing': false,
+                        'target': true
+                    },
+                    {   
+                        'id': 2,
+                        'title': '論文調査',
+                        'completed': false,
+                        'level': 2,
+                        'energy': -1,
+                        'editing': false,
+                        'target': false
+                    }
+                ],
+                targetsIndex: '',
+                subtodos: ''
+            },
+            methods: {
+                addTodo(){
+                    //空文字は追加できないようにする
+                    if (this.newTodo.trim().length == 0) {
+                        return
+                    }
+                    this.todos.push({
+                        id: this.idForTodo,
+                        title: this.newTodo,
+                        completed: false,
+                        level: 1,
+                        energy: 0,
+                        editing: false,
+                        target: false
+                    })
+                    //フォームを空にする
+                    this.newTodo = ''
+                    this.idForTodo++
+                },
+                editTodo(todo) {
+                    this.beforeEditCache = todo.title
+                    todo.editing = true
+                },
+                doneEdit(todo) {
+                    if (todo.title.trim() == '') {
+                    todo.title = this.beforeEditCache
+                    }
+                    todo.editing = false
+                },
+                removeTodo(index) {
+                    this.todos.splice(index, 1)
+                },
+                targetsMicrotasks: function(level, energy, index){
+                    //細分化のターゲットに色付け＆bold
+                    if(level >= 3 && energy >= 0){
+                        return "targets"
+                    }
+                }
+            },
+            computed: {
+            }
+        })
+    </script>
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: grey;
+        }
+
+        .targets {
+            font-weight: 700;
+            color: red;
+        }
+    </style>
+</body>
+</html>
