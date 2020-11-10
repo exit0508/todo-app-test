@@ -30,8 +30,9 @@
                     </option>
                 </select>
                 <button v-on:click="removeTodo(index)">&times;</button>
-                <button v-show="todo.target">細分化する</button>
-                <!-- <input type="text" v-if="todo.target" class="sub-todo-input" :key="sub" placeholder="タスクを細分化してください" v-model="newTodo" @keyup.enter="addTodo"> -->
+                <div>
+                    <input type="text" v-if="todo.target" class="sub-todo-input" :key="sub" placeholder="タスクを細分化してください" v-model="newTodo" @keyup.enter="addTodo">
+                </div>
             </div>
         </template>
     </div>
@@ -109,7 +110,8 @@
                     if(level >= 3 && energy >= 0){
                         this.$set(this.todos[index], 'target', true)
                         return "targets"
-                    }
+                    }   
+                    this.$set(this.todos[index], 'target', false)
                 }
             },
             computed: {
@@ -125,6 +127,14 @@
         .targets {
             font-weight: 700;
             color: red;
+        }
+
+        .notargets{
+            color: blue;
+        }
+
+        .sub-todo-input{
+            margin-left: 2%;
         }
     </style>
 </body>
