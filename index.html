@@ -69,7 +69,7 @@
                         'target': false
                     }
                 ],
-                targetsIndex: '',
+                preLevel: '',
                 subtodos: ''
             },
             methods: {
@@ -107,6 +107,7 @@
                 targetsMicrotasks: function(level, energy, index){
                     //細分化のターゲットに色付け＆bold
                     if(level >= 3 && energy >= 0){
+                        this.$set(this.todos[index], 'target', true)
                         return "targets"
                     }
                 }
