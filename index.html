@@ -30,8 +30,23 @@
                     </option>
                 </select>
                 <button v-on:click="removeTodo(index)">&times;</button>
-                <div>
-                    <input type="text" v-if="todo.target" class="sub-todo-input" :key="sub" placeholder="タスクを細分化してください" v-model="newTodo" @keyup.enter="addTodo">
+                <div v-if="todo.target" class= "sub-todo-input">
+                    <div v-for="(subtodo, index) in todo.subtodos" :key="subtodo.id">
+                        <input type="checkbox" v-model="subtodo.completed">
+                        <span v-bind:class="{completed: subtodo.completed}">{{ subtodo.title }}</span>
+
+                        <span style="color: #1e90ff">｜{{ subtodo.level }}</span>
+                        <input type="range" min="0" max="5" step="1" v-model="subtodo.level" @change="">
+
+                        <span style="color: #ff9e1e">｜{{ subtodo.energy }}</span>
+                        <select v-model="subtodo.energy">
+                            <option disabled value="">選択して下さい</option>
+                            <option v-for="level in levels" v-bind:value="level.value">
+                                {{ level.label }}
+                            </option>
+                        </select>
+                    </div>
+                    <input type="text" placeholder="タスクを細分化してください" v-model="newSubTodo" @keyup.enter="addSubTodo">
                 </div>
             </div>
         </template>
@@ -58,7 +73,23 @@
                         'level': 5,
                         'energy': 1,
                         'editing': false,
-                        'target': true
+                        'target': true,
+                        'subtodos': [{
+                            'id': 1,
+                            'title': '先行研究をまとめる',
+                            'completed': false,
+                            'level': 3,
+                            'energy': 0,
+                            'editing': false
+                        },
+                        {
+                            'id': 2,
+                            'title': '流れを確認する',
+                            'completed': false,
+                            'level': 3,
+                            'energy': 0,
+                            'editing': false
+                        }]
                     },
                     {   
                         'id': 2,
@@ -67,11 +98,13 @@
                         'level': 2,
                         'energy': -1,
                         'editing': false,
-                        'target': false
+                        'target': false,
+                        'subtodos': {}
                     }
                 ],
-                preLevel: '',
-                subtodos: ''
+                newSubTodo: '',
+                idForSubTodo: 3,
+                preSubTodo: [{}]
             },
             methods: {
                 addTodo(){
@@ -85,8 +118,8 @@
                         completed: false,
                         level: 1,
                         energy: 0,
-                        editing: false,
-                        target: false
+                        target: false,
+                        editing: false
                     })
                     //フォームを空にする
                     this.newTodo = ''
@@ -110,9 +143,37 @@
                     if(level >= 3 && energy >= 0){
                         this.$set(this.todos[index], 'target', true)
                         return "targets"
+                        return true
                     }   
                     this.$set(this.todos[index], 'target', false)
-                }
+                },
+                addSubTodo(){
+                    if (this.newSubTodo.trim().length == 0) {
+                        return
+                    }
+
+                    // this.preSubTodo.push({
+                    //     id: this.idForSubTodo,
+                    //     title: this.newSubTodo,
+                    //     completed: false,
+                    //     level: 1,
+                    //     energy: 0,
+                    //     editing: false
+                    // })
+
+                    this.$set(this.todos[0], 'subtodos', 
+                    [{
+                        id: this.idForSubTodo,
+                        title: this.newSubTodo,
+                        completed: false,
+                        level: 1,
+                        energy: 0,
+                        editing: false
+                    }])
+                    //フォームを空にする
+                    this.newSubTodo = ''
+                    this.idForSubTodo++
+                },
             },
             computed: {
             }
