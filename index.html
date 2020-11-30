@@ -5,197 +5,204 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <title>Todo list</title>
+    <title>Todo リスト</title>
 </head>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <body>
-    <div id=app>
-        <h1>Todo</h1>
-        <input type="text" class="todo-input" placeholder="タスクを入力してください" v-model="newTodo" @keyup.enter="addTodo">
-        
-        <div>タスク名|ネガティブ度|エネルギー</div>
-        <template>
-            <div v-for="(todo, index) in todos" :key="todo.id" class="todo-item">
-                <input type="checkbox" v-model="todo.completed">
-                <span v-if="!todo.editing" @dblclick="editTodo(todo)" v-bind:class="[targetsMicrotasks(todo.level, todo.energy, index),{completed: todo.completed}]">{{ todo.title }}</span>
-                <input v-else class="todo-item-edit" type="text" v-model="todo.title" @blur="doneEdit(todo)" @keyup.enter="doneEdit(todo)">
-                
-                <span style="color: #1e90ff">｜{{ todo.level }}</span>
-                <input type="range" min="0" max="5" step="1" v-model="todo.level" @change="">
-                
-                <span style="color: #ff9e1e">｜{{ todo.energy }}</span>
-                <select v-model="todo.energy">
-                    <option disabled value="">選択して下さい</option>
-                    <option v-for="level in levels" v-bind:value="level.value">
-                        {{ level.label }}
-                    </option>
-                </select>
-                <button v-on:click="removeTodo(index)">&times;</button>
-                <div v-if="todo.target" class= "sub-todo-input">
-                    <div v-for="(subtodo, index) in todo.subtodos" :key="subtodo.id">
-                        <input type="checkbox" v-model="subtodo.completed">
-                        <span v-bind:class="{completed: subtodo.completed}">{{ subtodo.title }}</span>
-
-                        <span style="color: #1e90ff">｜{{ subtodo.level }}</span>
-                        <input type="range" min="0" max="5" step="1" v-model="subtodo.level" @change="">
-
-                        <span style="color: #ff9e1e">｜{{ subtodo.energy }}</span>
-                        <select v-model="subtodo.energy">
-                            <option disabled value="">選択して下さい</option>
-                            <option v-for="level in levels" v-bind:value="level.value">
-                                {{ level.label }}
-                            </option>
-                        </select>
+    <div id='app'>
+        <div class="container">
+            <h2>TODO リスト</h2>
+            <div class=row>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="add-form" v-on:submit.prevent="addTodo()">
+                                <div class="row">
+                                    <div class="col-4 text-center">
+                                        <input type="text" class="todo-input" placeholder="タスク入力" v-model='newTodo'>
+                                    </div>
+                                    <div class="col">
+                                        <div class="label">
+                                            興味：
+                                        </div>
+                                        <div class="level">
+                                            {{ interest }}
+                                        </div>
+                                        <input type="range" min="0" max="5" step="1" v-model="interest">
+                                    </div>
+                                    <div class="col">
+                                        <div class="label">
+                                            楽しさ：
+                                        </div>
+                                        <div class="level">
+                                            {{ pleasant }}
+                                        </div>
+                                        <input type="range" min="0" max="5" step="1" v-model="pleasant">
+                                    </div>
+                                    <div class="col">
+                                        <div class="label">
+                                            複雑度：
+                                        </div>
+                                        <div class="level">
+                                            {{ complexity }}
+                                        </div>
+                                        <input type="range" min="0" max="5" step="1" v-model="complexity">
+                                    </div>
+                                    <div class="col">
+                                        <div class="label">
+                                            重要度：
+                                        </div>
+                                        <div class="level">
+                                            {{ importance }}
+                                        </div>
+                                        <input type="range" min="0" max="5" step="1" v-model="importance">
+                                    </div>
+                                    <div class="col submit-button">
+                                        <button type="submit"><img src="img\add-24px.svg" alt="追加" /></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <input type="text" placeholder="タスクを細分化してください" v-model="newSubTodo" @keyup.enter="addSubTodo">
                 </div>
             </div>
-        </template>
+            <h2>登録済み</h2>
+            <div class="todo-list">
+                    <div v-for="(todo, index) in todos">
+                    {{ todo.id }} - {{ todo.title }} - {{ todo.interest }} - {{ todo.pleasant }} - {{ todo.complexity }} - {{ todo.importance }}
+                        <button v-on:click="removeTodo(index)">&times;</button>
+                        <div v-if="todo.complexity > 2">
+                            <button v-on:click="getIndex(index)" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseMicro" aria-expanded="false" aria-controls="collapseExample">
+                                細分化する
+                            </button>
+                            <div class="collapse" id="collapseMicro">
+                                <div class="card card-body">
+                                    <div v-for="(subtodo, index) in showMicrotasks">
+                                    {{ subtodo.id }} - {{ subtodo.title }}
+                                    </div>
+                                    <emit-event v-on:from-child="receiveMessage"></emit-event>
+                                    <span>
+                                        <button type="submit"><img src="img\done-24px.svg" alt="追加" /></button>
+                                        <button type="submit"><img src="img\create-24px.svg" alt="編集" /></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    <!-- <pre>{{ $data }}</pre> -->
     </div>
-    
     <script>
-        new Vue({
-            el: "#app",
-            data: {
-                current: '',
-                levels: [
-                    { value:1, label:'高'},
-                    { value:0, label:'中'},
-                    { value:-1, label:'低'}
-                ],
-                newTodo: '',
-                idForTodo: 3,
-                beforeEditCache: '',
-                todos: [
-                    {
-                        'id': 1,
-                        'title': 'プレゼン資料作成',
-                        'completed': false,
-                        'level': 5,
-                        'energy': 1,
-                        'editing': false,
-                        'target': true,
-                        'subtodos': [{
-                            'id': 1,
-                            'title': '先行研究をまとめる',
-                            'completed': false,
-                            'level': 3,
-                            'energy': 0,
-                            'editing': false
-                        },
-                        {
-                            'id': 2,
-                            'title': '流れを確認する',
-                            'completed': false,
-                            'level': 3,
-                            'energy': 0,
-                            'editing': false
-                        }]
-                    },
-                    {   
-                        'id': 2,
-                        'title': '論文調査',
-                        'completed': false,
-                        'level': 2,
-                        'energy': -1,
-                        'editing': false,
-                        'target': false,
-                        'subtodos': {}
-                    }
-                ],
-                newSubTodo: '',
-                idForSubTodo: 3,
-                preSubTodo: [{}]
+
+        Vue.component('emit-event',{
+            template: `<div><input type="text" v-model="inputText" placeholder="タスク細分化"><button v-on:click="clickEvent">+</button></div>`,
+            data: function(){
+                return {
+                    inputText: ''
+                }
             },
             methods: {
-                addTodo(){
-                    //空文字は追加できないようにする
+                clickEvent: function(){
+                    this.$emit('from-child', this.inputText)
+                    this.inputText = ''
+                }
+            }
+        })
+
+        new Vue({
+            el: '#app',
+            data: {
+                subtodos: [],
+                subid: '',
+                newTodo: '',
+                idForTodo: '2',
+                interest: '0',
+                pleasant: '0',
+                complexity: '0',
+                importance: '0',
+                beforeEditCache: '',
+                completed: false,
+                message: '',
+                todos:[
+                    {
+                        id: 1,
+                        title: 'スライド作成',
+                        interest: 3,
+                        pleasant: 2,
+                        complexity: 2,
+                        importance: 4
+                    }
+                ],
+                microtasks: []
+            },
+            methods: {
+                receiveMessage: function(message){
+                    this.message = message;
+                    this.subtodos.push({
+                        id: this.subid,
+                        title: this.message
+                    })
+                },
+                addTodo: function(){
                     if (this.newTodo.trim().length == 0) {
                         return
                     }
                     this.todos.push({
                         id: this.idForTodo,
                         title: this.newTodo,
-                        completed: false,
-                        level: 1,
-                        energy: 0,
-                        target: false,
-                        editing: false
+                        interest: this.interest,
+                        pleasant: this.pleasant,
+                        complexity: this.complexity,
+                        importance: this.importance
                     })
                     //フォームを空にする
                     this.newTodo = ''
                     this.idForTodo++
-                },
-                editTodo(todo) {
-                    this.beforeEditCache = todo.title
-                    todo.editing = true
-                },
-                doneEdit(todo) {
-                    if (todo.title.trim() == '') {
-                    todo.title = this.beforeEditCache
-                    }
-                    todo.editing = false
-                },
-                removeTodo(index) {
-                    this.todos.splice(index, 1)
-                },
-                targetsMicrotasks: function(level, energy, index){
-                    //細分化のターゲットに色付け＆bold
-                    if(level >= 3 && energy >= 0){
-                        this.$set(this.todos[index], 'target', true)
-                        return "targets"
+                    },
+                createMicrotasks: function() {
+                    if(this.complexity > 2){
                         return true
-                    }   
-                    this.$set(this.todos[index], 'target', false)
-                },
-                addSubTodo(){
-                    if (this.newSubTodo.trim().length == 0) {
-                        return
+                    }else{
+                        this.idForTodo++
+                        return false
                     }
-
-                    // this.preSubTodo.push({
-                    //     id: this.idForSubTodo,
-                    //     title: this.newSubTodo,
-                    //     completed: false,
-                    //     level: 1,
-                    //     energy: 0,
-                    //     editing: false
-                    // })
-
-                    this.$set(this.todos[0], 'subtodos', 
-                    [{
-                        id: this.idForSubTodo,
-                        title: this.newSubTodo,
-                        completed: false,
-                        level: 1,
-                        energy: 0,
-                        editing: false
-                    }])
-                    //フォームを空にする
-                    this.newSubTodo = ''
-                    this.idForSubTodo++
-                },
+                    },
+                removeTodo: function(index) {
+                    this.todos.splice(index, 1)
+                    },
+                getIndex: function(index){
+                    console.log(index + 1)
+                    this.subid = index + 1
+                }
             },
             computed: {
+                showMicrotasks: function(){
+                    return this.subtodos.filter(item => item.id == this.subid)
+                }
             }
         })
     </script>
     <style>
-        .completed {
-            text-decoration: line-through;
-            color: grey;
+        .todo-input {
+            margin-top: 5%;
+            padding: 0% 15%
         }
 
-        .targets {
+        .label {
+            font-size: small;
+        }
+
+        .level {
+            font-size: large;
             font-weight: 700;
-            color: red;
         }
 
-        .notargets{
-            color: blue;
-        }
-
-        .sub-todo-input{
-            margin-left: 2%;
+        .submit-button {
+            margin-top: 2%;
         }
     </style>
 </body>
