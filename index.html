@@ -75,7 +75,7 @@
                     {{ todo.id }} - {{ todo.title }} - {{ todo.interest }} - {{ todo.pleasant }} - {{ todo.complexity }} - {{ todo.importance }}
                         <button v-on:click="removeTodo(index)">&times;</button>
                         <div v-if="todo.complexity > 2">
-                            <button v-on:click="getIndex(index)" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseMicro" aria-expanded="false" aria-controls="collapseExample">
+                            <button v-on:click="getIndex(index)" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseMicro" aria-expanded="false" aria-controls="collapseMicro">
                                 細分化する
                             </button>
                             <div class="collapse" id="collapseMicro">
