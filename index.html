@@ -128,15 +128,12 @@
                         <button v-on:click="removeTodo(index)"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
                     </div>
                 </div>
-                <div v-if="todo.complexity > 2">
-                    <button v-on:click="getIndex(index)" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseMicro" aria-expanded="false" aria-controls="collapseMicro">
-                        細分化する
-                    </button>
-                    <div class="collapse" id="collapseMicro">
-                        <div class="card card-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div v-if="todo.complexity > 2">
                             <div class="todo-item">
                                 <div class="todo-title">
-                                    タスク名
+                                    サブタスク名
                                 </div>
                                 <div class="todo-param">
                                     <div class="param-label">興味：</div>
@@ -154,50 +151,55 @@
                                     <div class="param-label">編集/削除：</div>
                                 </div>
                             </div>
-                            <div v-for="(subtodo, index) in showMicrotasks">
-                                <div class="todo-item">
-                                    <div class="todo-title">
-                                        <input type="checkbox">
-                                        <span v-if="!subtodo.editing">{{ subtodo.title }}</span>
-                                        <input v-else type="text" v-model="subtodo.title" v-show="subtodo.editing">  
-                                    </div>
-                                    <div class="todo-param">
-                                        <!-- <div class="param-label">興味：</div> -->
-                                        <div class="param-level">{{ subtodo.interest }}</div>
-                                        <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.interest">
-                                    </div>
-                                    <div class="todo-param">
-                                        <!-- <div class="param-label">楽しさ：</div> -->
-                                        <div class="param-level">{{ subtodo.pleasant }}</div>
-                                        <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.pleasant">
-                                    </div>
-                                    <div class="todo-param">
-                                        <!-- <div class="param-label">複雑度：</div> -->
-                                        <div class="param-level">{{ subtodo.complexity }}</div>
-                                        <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.complexity">
-                                    </div>
-                                    <div class="todo-param">
-                                        <!-- <div class="param-label">重要度：</div> -->
-                                        <div class="param-level">{{ subtodo.importance }}</div>
-                                        <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.importance">
-                                    </div>
-                                    <div class="buttons">
-                                        <button v-show="!subtodo.editing" v-on:click="editMicrotodo(subtodo, index)" class="edit-btn" type="button"><img src="img\create-24px.svg" alt="編集" /></button>
-                                        <button v-show="subtodo.editing" v-on:click="doneMicroEdit(subtodo, index)"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></button>
-                                        <button class="remove-btn" v-on:click="removeMicrotodo(index)"><img src="img\clear-24px.svg" alt=""></button>
+                            <div v-for="(subtodo, index) in subtodos">
+                                <div v-show="todo.id == subtodo.id">
+                                    <div class="todo-item">
+                                        <div class="todo-title">
+                                            <input type="checkbox">
+                                            <span v-if="!subtodo.editing">{{ subtodo.title }}</span>
+                                            <input v-else type="text" v-model="subtodo.title" v-show="subtodo.editing">  
+                                        </div>
+                                        <div class="todo-param">
+                                            <!-- <div class="param-label">興味：</div> -->
+                                            <div class="param-level">{{ subtodo.interest }}</div>
+                                            <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.interest">
+                                        </div>
+                                        <div class="todo-param">
+                                            <!-- <div class="param-label">楽しさ：</div> -->
+                                            <div class="param-level">{{ subtodo.pleasant }}</div>
+                                            <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.pleasant">
+                                        </div>
+                                        <div class="todo-param">
+                                            <!-- <div class="param-label">複雑度：</div> -->
+                                            <div class="param-level">{{ subtodo.complexity }}</div>
+                                            <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.complexity">
+                                        </div>
+                                        <div class="todo-param">
+                                            <!-- <div class="param-label">重要度：</div> -->
+                                            <div class="param-level">{{ subtodo.importance }}</div>
+                                            <input v-show="subtodo.editing" type="range" min="0" max="5" step="1" v-model="subtodo.importance">
+                                        </div>
+                                        <div class="buttons">
+                                            <button v-show="!subtodo.editing" v-on:click="editMicrotodo(subtodo, index)" class="edit-btn" type="button"><img src="img\create-24px.svg" alt="編集" /></button>
+                                            <button v-show="subtodo.editing" v-on:click="doneMicroEdit(subtodo, index)"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></button>
+                                            <button class="remove-btn" v-on:click="removeMicrotodo(index)"><img src="img\clear-24px.svg" alt=""></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <add-microtodo v-on:micro-form="addMicrotask"></add-microtodo>
+                            <div class="card mt-5">
+                                <div class="card-body">
+                                    <add-microtodo v-on:micro-form="addMicrotask"></add-microtodo>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
     </div>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-database.js"></script>
     <script>
         Vue.component('add-microtodo',{
             template: `<div class="mt-5">
@@ -243,8 +245,8 @@
                             </div>
                         </div>
                             <div class="row float-right">
-                                        <div class="col-lg-10 col-md-6 col-sm-10 submit-button">
-                                            <button v-on:click="addClick">+</button>
+                                        <div class="col-lg-8 col-md-6 col-sm-10">
+                                            <button v-on:click="addClick"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
                                         </div>
                             </div>
                         </div>`,
@@ -269,18 +271,34 @@
             }
         })
 
+        var firebaseConfig = {
+            apiKey: "AIzaSyCxn221dzyVAtDPGIBAi62k_qUD2seZxHs",
+            authDomain: "todo-app-45e88.firebaseapp.com",
+            databaseURL: "https://todo-app-45e88-default-rtdb.firebaseio.com",
+            projectId: "todo-app-45e88",
+            storageBucket: "todo-app-45e88.appspot.com",
+            messagingSenderId: "53752902064",
+            appId: "1:53752902064:web:cba277cd27c52b45b66675"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
         new Vue({
             el: '#app',
             data: {
+                database: null,
+                todosRef: null,
+                subtodosRef: null,
                 subtodos: [],
+                subtodosArry: [],
                 microtodo: '',
                 subInterest: 0,
                 subPleasant: 0,
                 subComplexity: 0,
                 subImportance: 0,
-                subid: '',
+                subid: 0,
                 newTodo: '',
-                idForTodo: '2',
+                idForTodo: 1,
                 interest: '0',
                 pleasant: '0',
                 complexity: '0',
@@ -288,18 +306,53 @@
                 beforeEditCache: '',
                 completed: false,
                 message: '',
-                todos:[
-                    {
-                        id: 1,
-                        title: 'スライド作成',
-                        interest: 3,
-                        pleasant: 2,
-                        complexity: 2,
-                        importance: 4,
-                        completed: false,
-                        editing: false
+                todos:[]
+            },
+            created: function() {
+                //DBのインスタンスを初期化
+                this.database = firebase.database(); //DB参照を取得
+                this.todosRef = this.database.ref('todos') //データの読み書きを行う
+                this.subtodosRef = this.database.ref('subtodos')
+
+                var _this = this;
+                // this.todosRef.on('value', (data)=>{
+                //     if(data){
+                //         const rootList = data.val();
+                //         const key = data.key;
+
+                //         if(rootList != null){
+                //             Object.keys(rootList).forEach((val, key) => {
+                //                 rootList[val].id = val;
+                //                 this.todos.push(rootList[val])
+                //             })
+                //         }
+
+                //     }
+                // })
+
+                 //データに変更があると実行される
+                 this.todosRef.on('value', function(snapshot){ //onメソッド：イベントを監視
+                    _this.todos = snapshot.val(); //再取得してtodosに格納
+                });
+                this.subtodosRef.on('value', function(snapshot){
+                    _this.subtodos = snapshot.val();
+                });
+                //subtodoArryに配列として格納
+                this.subtodosRef.on('value', (data)=>{
+                    if(data){
+                        const rootList = data.val();
+                        const key = data.key;
+
+                    if(rootList != null){
+                            Object.keys(rootList).forEach((val, key) => {
+                                rootList[val].id = val;
+                                this.subtodosArry.push(rootList[val])
+                            })
+                        }
+
                     }
-                ],
+                })
+
             },
             methods: {
                 addMicrotask: function(microtodo, interest, pleasant, complexity, importance){
@@ -312,7 +365,7 @@
                     this.subComplexity = complexity;
                     this.subImportance = importance;
 
-                    this.subtodos.push({
+                    this.subtodosRef.push({
                         id: this.subid,
                         title: this.microtodo,
                         interest: this.subInterest,
@@ -323,7 +376,7 @@
                     })
                 },
                 removeMicrotodo: function(index){
-                    this.subtodos.splice(index, 1)
+                    this.database.ref('subtodos').child(index).remove();
                 },
                 editMicrotodo(subtodo, index){
                     this.beforeEditCache = subtodo.title
@@ -334,30 +387,39 @@
                     this.title = this.beforeEditCache
                     }
                     subtodo.editing = false
-                    this.subtodos.splice(index, 1, {
-                        id: subtodo.id,
-                        title: subtodo.title,
-                        interest: subtodo.interest,
-                        pleasant: subtodo.pleasant,
-                        complexity: subtodo.complexity,
-                        importance: subtodo.importance,
-                        completed: false,
-                        editing: false
-                    })
+                    var updates = {};
+                    updates['/subtodos/' + index] = subtodo;
+                    this.database.ref().update(updates);
+                    // this.subtodos.splice(index, 1, {
+                    //     id: subtodo.id,
+                    //     title: subtodo.title,
+                    //     interest: subtodo.interest,
+                    //     pleasant: subtodo.pleasant,
+                    //     complexity: subtodo.complexity,
+                    //     importance: subtodo.importance,
+                    //     completed: false,
+                    //     editing: false
+                    // })
                 },
                 addTodo: function(){
                     if (this.newTodo.trim().length == 0) {
                         return
                     }
-                    this.todos.push({
+                    this.todosRef.push({
                         id: this.idForTodo,
                         title: this.newTodo,
                         interest: this.interest,
                         pleasant: this.pleasant,
                         complexity: this.complexity,
                         importance: this.importance,
-                        completed: false
+                        completed: false,
+                        subtodos: []
                     })
+
+                    if(this.complexity > 2){
+                        this.subid = this.idForTodo
+                        console.log(this.subid)
+                    }
                     //フォームを空にする
                     this.newTodo = ''
                     this.interest = 0
@@ -375,10 +437,12 @@
                     }
                     },
                 removeTodo: function(index) {
-                    this.todos.splice(index, 1)
+                    this.database.ref('todos').child(index).remove();
+                    //this.todos.splice(index, 1)
                     },
                 getIndex: function(index){
-                    this.subid = index + 1
+                    this.subid = index
+                    console.log(this.subid)
                 },
                 editTodo(todo, index){
                     console.log(todo)
@@ -391,21 +455,42 @@
                     this.title = this.beforeEditCache
                     }
                     todo.editing = false
-                    this.todos.splice(index, 1, {
-                        id: todo.id,
-                        title: todo.title,
-                        interest: todo.interest,
-                        pleasant: todo.pleasant,
-                        complexity: todo.complexity,
-                        importance: todo.importance,
-                        completed: false,
-                        editing: false
-                    })
+                    var updates = {};
+                    updates['/todos/' + index] = todo;
+                    this.database.ref().update(updates);
+                    // this.todos.splice(index, 1, {
+                    //     id: todo.id,
+                    //     title: todo.title,
+                    //     interest: todo.interest,
+                    //     pleasant: todo.pleasant,
+                    //     complexity: todo.complexity,
+                    //     importance: todo.importance,
+                    //     completed: false,
+                    //     editing: false
+                    // })
                 }
             },
             computed: {
                 showMicrotasks: function(){
-                    return this.subtodos.filter(item => item.id == this.subid)
+                    if(this.subtodos != null){
+                        firebase.database().ref('subtodos').orderByChild('id').startAt(this.subid).endAt(this.subid).once('value',
+                        function(snapshot){
+                            return(snapshot.val())})
+                    }else{
+                        return
+                    }
+                },
+                checkMicrotasks: function(){
+                    if(this.subtodos != null){
+                        firebase.database().ref('subtodos').orderByChild('complexity').startAt(3).once('value',
+                        function(snapshot){
+                            if(snapshot.exists()){
+                                console.log('複雑度3以上のものが存在します')
+                            }
+                        })
+                    }else{
+                        return
+                    }
                 }
             }
         })
